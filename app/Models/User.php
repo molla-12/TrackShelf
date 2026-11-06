@@ -47,4 +47,19 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function shops()
+    {
+        return $this->belongsToMany(Shop::class, 'shop_users')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function isShopOwner(Shop $shop): bool
+    {
+        return $this->shops()
+            ->where('shop_id', $shop->id)
+            ->wherePivot('role', 'owner')
+            ->exists();
+    }
 }
